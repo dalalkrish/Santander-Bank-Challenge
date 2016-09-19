@@ -42,7 +42,7 @@ for (i in 1:ncol(x)) {
             main = paste("Total unique values", d, sep = ':'), xlab = paste("feature", i, sep = ':'))
   }}
 
-#Scaling the Data
+#Scaling and transforming the Data
 library(caret)
 preProc_x <- preProcess(x[,-252], method = "knnImpute", thresh = 0.80, verbose = F)
 x_1 <- predict(preProc_x, x)
