@@ -1,3 +1,5 @@
+#R_script
+
 setwd("/Users/Krishnang/Documents/Data Mining Case/krish")
 
 ini_train <- read.csv('Train.csv', header = T)
