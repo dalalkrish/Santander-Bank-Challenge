@@ -28,7 +28,7 @@ for (i in 1:b) {
 x <- ini_train1[,-c(26:29)]
 y <- ini_test1[,-c(26:29)]
 
-
+#Visualizing the Data
 for (i in 1:ncol(x)) {
   c <- unique(x[,i])
   d <- length(c)
@@ -42,7 +42,7 @@ for (i in 1:ncol(x)) {
             main = paste("Total unique values", d, sep = ':'), xlab = paste("feature", i, sep = ':'))
   }}
 
-
+#Scaling the Data
 library(caret)
 preProc_x <- preProcess(x[,-252], method = "knnImpute", thresh = 0.80, verbose = F)
 x_1 <- predict(preProc_x, x)
@@ -68,6 +68,7 @@ test[,5] = mapvalues(test$Cust_status, from = c("Old", "New"), to = c("1", "0"))
 # train[,-c(1:5,256)] <- rm.outlier(train[,-c(1:5,256)], fill = T, opposite = T)
 # test <- rm.outlier(test[,-c(1:5)], fill = T, opposite = T)
 
+#Applying ML algorithms
 library(e1071)
 model <- svm(Active_Customer~., data = train, na.action = na.omit)
 pred <- predict(model, test)
@@ -75,7 +76,6 @@ pred
 new_svm <- ifelse(pred >= 0.5, 1, 0)
 table(new_svm)
 out_df <- cbind.data.frame(ini_test$Cust_id,new_svm)
-out <- write.csv(out_df,"attempt_2.csv")
 
 log.model <- glm(Active_Customer~., family = binomial(link = "logit"),
                  data = train)
@@ -83,17 +83,15 @@ log.pred <- predict(log.model, test, type = "response", level = 0.95)
 new_logit <- ifelse(log.pred > 0.5, 1, 0)
 table(new_logit)
 out.log <- cbind.data.frame(ini_test$Cust_id, new_logit)
-write.csv(out.log, "attempt_3.csv")
 
 library(randomForest)
 m <- randomForest(Active_Customer~., data = train, ntree=100, norm.votes = F)
 m.pred <- predict(m, test)
 new_rf <- ifelse(m.pred >= 0.5, 1,0)
 table(new_rf)
-write.csv(out.log, "attempt_3.csv")
 
+#Using Ensemble method to achieve better accuracy
 assemble <- cbind.data.frame(ini_test$Cust_id, new_svm, new_logit, new_rf)
-
 assemble = within(assemble, {
   final.col = ifelse(assemble[,2]+assemble[,3]+assemble[,4] >= 2, 1,0)
 })
